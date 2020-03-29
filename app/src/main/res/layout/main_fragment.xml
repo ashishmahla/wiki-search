@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.motion.widget.MotionLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mlMfRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layoutDescription="@xml/main_fragment_scene"
+    tools:context=".ui.main.MainFragment">
+
+    <View
+        android:id="@+id/viewMfToolbarBackground"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/ivMfWikiLogo"
+        android:layout_width="0dp"
+        android:layout_height="56dp"
+        android:fitsSystemWindows="true"
+        android:src="@drawable/wiki_logo"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cvMfSearchWrapper"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:fitsSystemWindows="true"
+        app:cardCornerRadius="32dp"
+        app:cardElevation="2dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/ivMfWikiLogo"
+        app:layout_constraintTop_toTopOf="parent"
+        app:strokeColor="#efefef"
+        app:strokeWidth="0.4dp">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/mtvMfSearchCompletion"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:ellipsize="end"
+                android:gravity="center_vertical"
+                android:maxLines="1"
+                android:paddingStart="16dp"
+                android:paddingTop="12dp"
+                android:paddingEnd="16dp"
+                android:paddingBottom="12dp"
+                android:textColor="#9f9990"
+                android:textSize="18sp"
+                app:layout_constraintBottom_toBottomOf="@id/tietMfSearchQuery"
+                app:layout_constraintEnd_toEndOf="@id/tietMfSearchQuery"
+                app:layout_constraintStart_toStartOf="@id/tietMfSearchQuery"
+                app:layout_constraintTop_toTopOf="@id/tietMfSearchQuery"
+                tools:text="Albert Einstein" />
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/tietMfSearchQuery"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@null"
+                android:hint="@string/search"
+                android:maxLines="1"
+                android:singleLine="true"
+                android:inputType="text"
+                android:paddingStart="16dp"
+                android:paddingTop="12dp"
+                android:paddingEnd="16dp"
+                android:paddingBottom="12dp"
+                android:textSize="18sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="Albert" />
+
+            <View
+                android:id="@+id/viewMfSpDivider"
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:background="#f0f0f0"
+                android:visibility="gone"
+                app:layout_constraintBottom_toTopOf="@id/rvMfSearchPredictions"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tietMfSearchQuery"
+                app:layout_constraintWidth_percent="1"
+                tools:visibility="visible" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvMfSearchPredictions"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="8dp"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHeight_percent="1"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tietMfSearchQuery"
+                tools:itemCount="7"
+                tools:listitem="@layout/model_search_prediction"
+                tools:visibility="visible" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvMfSearchResults"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/viewMfToolbarBackground"
+        tools:itemCount="7"
+        tools:listitem="@layout/model_search_prediction"
+        tools:visibility="visible" />
+</androidx.constraintlayout.motion.widget.MotionLayout>
