@@ -18,7 +18,7 @@ interface ApiInterface {
                 "&redirects=1" +
                 "&formatversion=2" +
                 "&piprop=thumbnail" +
-                "&pithumbsize=100" +
+                "&pithumbsize=200" +
                 "&pilimit=10" +
                 "&wbptterms=description" +
                 "&gpslimit=17"
