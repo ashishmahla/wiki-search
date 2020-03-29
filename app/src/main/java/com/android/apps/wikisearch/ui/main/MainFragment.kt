@@ -1,6 +1,7 @@
 package com.android.apps.wikisearch.ui.main
 
 import android.app.Activity
+import android.content.Context
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
@@ -9,7 +10,7 @@ import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
+import android.view.inputmethod.InputMethodManager
 import androidx.annotation.ColorInt
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
@@ -18,8 +19,10 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.get
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.android.apps.wikisearch.R
+import com.android.apps.wikisearch.models.Page
 import com.android.apps.wikisearch.ui.adapters.HybridSearchPredictionAdapter
 import kotlinx.android.synthetic.main.main_fragment.*
 import kotlinx.coroutines.launch
@@ -29,7 +32,6 @@ class MainFragment : Fragment() {
 
     companion object {
         const val TAG = "MainFragment"
-        fun newInstance() = MainFragment()
     }
 
     private lateinit var viewModel: MainViewModel
@@ -37,8 +39,7 @@ class MainFragment : Fragment() {
     private lateinit var searchResultAdapter: HybridSearchPredictionAdapter
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         return inflater.inflate(R.layout.main_fragment, container, false)
     }
@@ -46,21 +47,25 @@ class MainFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         activity?.let {
-            setStatusBarColor(it, Color.WHITE, true)
+            setStatusBarColor(it, Color.parseColor("#F7F6F5"), true)
         }
 
         viewModel = ViewModelProvider(this).get()
 
         setupPredictionRecyclerView()
         setupSearchTextView()
+        setupSearchResultRecyclerView()
     }
 
     private fun setupSearchTextView() {
         tietMfSearchQuery.setText(viewModel.searchQuery)
         tietMfSearchQuery.doAfterTextChanged {
             val sq = it.toString().trim()
-            viewModel.searchQuery = sq
-            setTopPredictionText(mtvMfSearchCompletion.text.toString(), sq)
+            if (sq != viewModel.searchQuery) {
+                viewModel.isSubmitted = false
+                viewModel.searchQuery = sq
+                setTopPredictionText(mtvMfSearchCompletion.text.toString(), sq)
+            }
         }
 
         tietMfSearchQuery.setOnFocusChangeListener { _: View, hasFocus: Boolean ->
@@ -74,13 +79,10 @@ class MainFragment : Fragment() {
             }
         }
 
-        tietMfSearchQuery.setOnEditorActionListener { textView: TextView, i: Int, keyEvent: KeyEvent ->
-            if (keyEvent.keyCode == KeyEvent.KEYCODE_ENTER) {
-                lifecycleScope.launch {
-                    viewModel.getSearchPredictions(textView.text.toString()).pages.let {
-                        searchResultAdapter.refreshDataSet(it)
-                    }
-                }
+        tietMfSearchQuery.setOnKeyListener { _, keyCode, event ->
+            if (event.action == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
+                submitSearchText(tietMfSearchQuery.text.toString().trim())
+
                 true
             } else false
         }
@@ -97,6 +99,8 @@ class MainFragment : Fragment() {
                 rvMfSearchPredictions.isVisible = false
                 viewMfSpDivider.isVisible = false
 
+                setTopPredictionText("", viewModel.searchQuery ?: "")
+
                 Log.e(TAG, "Failed to load search predictions, searchPrediction: $it")
             }
         })
@@ -104,7 +108,8 @@ class MainFragment : Fragment() {
 
     private fun setupPredictionRecyclerView() {
         searchPredictionAdapter = HybridSearchPredictionAdapter(isCompactAdapter = true) {
-            TODO("Implement click listener")
+            tietMfSearchQuery.setText(it.title)
+            submitSearchText(it.title)
         }
 
         rvMfSearchPredictions.apply {
@@ -117,7 +122,7 @@ class MainFragment : Fragment() {
 
     private fun setupSearchResultRecyclerView() {
         searchResultAdapter = HybridSearchPredictionAdapter(isCompactAdapter = false) {
-            TODO("Implement click listener")
+            launchWebView(it)
         }
 
         rvMfSearchResults.apply {
@@ -125,6 +130,11 @@ class MainFragment : Fragment() {
             adapter = searchResultAdapter
 
             setHasFixedSize(true)
+        }
+
+        viewModel.searchResult?.let {
+            searchResultAdapter.refreshDataSet(it.pages)
+            viewModel.isSubmitted = true
         }
     }
 
@@ -145,6 +155,38 @@ class MainFragment : Fragment() {
                 else View.SYSTEM_UI_FLAG_VISIBLE
 
             activity.window.statusBarColor = statusBarColor
+        }
+    }
+
+    private fun submitSearchText(searchText: String) {
+        hideKeyboard()
+        viewModel.isSubmitted = true
+        lifecycleScope.launch {
+            try {
+                viewModel.getSearchPredictions(searchText).let {
+                    viewModel.searchResult = it
+                    searchResultAdapter.refreshDataSet(it.pages)
+                }
+            } catch (exp: Exception) {
+                exp.printStackTrace()
+            }
+        }
+    }
+
+    private fun launchWebView(page: Page) {
+        val action = MainFragmentDirections.actionMainFragmentToWebViewFragment(
+            page.title, page.fullUrl
+        )
+
+        findNavController().navigate(action)
+    }
+
+    private fun hideKeyboard() {
+        val view = activity?.currentFocus
+        view?.let { v ->
+            val imm =
+                activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+            imm?.hideSoftInputFromWindow(v.windowToken, 0)
         }
     }
 }

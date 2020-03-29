@@ -13,6 +13,7 @@ data class SearchPrediction(
 data class Page(
     val pageId: Int,
     val title: String,
+    val fullUrl: String,
     val index: Int,
     val description: String?,
     val thumbnail: Thumbnail?
@@ -42,6 +43,7 @@ class SearchPredictionDeserializer : JsonDeserializer<SearchPrediction> {
                 val page = Page(
                     pageId = pageJson.get("pageid")?.asInt ?: 0,
                     title = pageJson.get("title")?.asString ?: "",
+                    fullUrl = pageJson.get("fullurl")?.asString ?: "",
                     index = pageJson.get("index")?.asInt ?: 0,
 
                     description = pageJson.getAsJsonObject("terms")

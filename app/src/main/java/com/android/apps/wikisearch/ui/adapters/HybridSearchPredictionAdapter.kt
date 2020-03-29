@@ -3,14 +3,17 @@ package com.android.apps.wikisearch.ui.adapters
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.android.apps.wikisearch.R
 import com.android.apps.wikisearch.models.Page
+import com.bumptech.glide.Glide
 import com.google.android.material.textview.MaterialTextView
 
 class HybridSearchPredictionAdapter(
     private val isCompactAdapter: Boolean,
-    private val itemClickListener: (position: Int) -> Unit
+    private val itemClickListener: (page: Page) -> Unit
 ) :
     RecyclerView.Adapter<HybridSearchPredictionAdapter.SearchPredictionViewHolder>() {
 
@@ -53,7 +56,7 @@ class HybridSearchPredictionAdapter(
 
         init {
             itemView.setOnClickListener {
-                itemClickListener(adapterPosition)
+                itemClickListener(itemList[adapterPosition])
             }
         }
 
@@ -70,17 +73,33 @@ class HybridSearchPredictionAdapter(
     }
 
     inner class SpViewHolderFull(itemView: View) : SearchPredictionViewHolder(itemView) {
-        private val ivImage = itemView.findViewById<MaterialTextView>(R.id.ivMsrImage)
+        private val ivImage = itemView.findViewById<ImageView>(R.id.ivMsrImage)
         private val mtvTitle = itemView.findViewById<MaterialTextView>(R.id.mtvMsrTitle)
         private val mtvLink = itemView.findViewById<MaterialTextView>(R.id.mtvMsrLink)
         private val mtvDescription = itemView.findViewById<MaterialTextView>(R.id.mtvMsrDescription)
 
         override fun onBind(searchPredictionPage: Page) {
             mtvTitle.text = searchPredictionPage.title
-            mtvLink.text = searchPredictionPage.pageId.toString()
+            mtvLink.text = searchPredictionPage.fullUrl.let {
+                if (it.isEmpty()) "<Error: No url found>"
+                else it
+            }
+
             mtvDescription.text =
                 if (!searchPredictionPage.description.isNullOrBlank()) searchPredictionPage.description
                 else "Page description not available"
+
+            if (searchPredictionPage.thumbnail?.source != null) {
+                ivImage.isVisible = true
+                Glide.with(itemView).apply {
+                    this.clear(ivImage)
+                    this.load(searchPredictionPage.thumbnail.source)
+                        .into(ivImage)
+                }
+
+            } else {
+                ivImage.isVisible = false
+            }
         }
     }
 }

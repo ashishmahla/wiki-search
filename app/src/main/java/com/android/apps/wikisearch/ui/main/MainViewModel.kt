@@ -23,9 +23,21 @@ class MainViewModel : ViewModel() {
     private val _searchPrediction: MutableLiveData<SearchPrediction> = MutableLiveData()
 
     private var searchPredictionJob: Job? = null
-    private var isJobWaitingForTimeout = true
+    private var isJobWaitingForTimeout = false
+
+    var isSubmitted: Boolean = false
+        set(value) {
+            if (value) {
+                searchPredictionJob?.cancel()
+                _searchPrediction.value = null
+            }
+
+            field = value
+        }
 
     val searchPrediction: LiveData<SearchPrediction> = _searchPrediction
+    var searchResult: SearchPrediction? = null
+
     var searchQuery: String? = null
         set(value) {
             field = value
@@ -33,28 +45,35 @@ class MainViewModel : ViewModel() {
         }
 
     private fun resetSearchPredictionsJob() {
-        searchPredictionJob?.cancel()
-        searchPredictionJob = this.viewModelScope.launch {
-            isJobWaitingForTimeout = true
-            var sq: String? = null
+        if (!isJobWaitingForTimeout) {
+            searchPredictionJob?.cancel()
+            searchPredictionJob = this.viewModelScope.launch {
+                isJobWaitingForTimeout = true
 
-            while (sq != searchQuery) {
-                sq = searchQuery
-                delay(500)
-            }
+                try {
+                    var sq: String? = null
 
-            isJobWaitingForTimeout = false
-            if (!sq.isNullOrBlank()) {
-                _searchPrediction.value = withContext(Dispatchers.IO) {
-                    try {
-                        getSearchPredictions(sq)
-                    } catch (exp: Exception) {
-                        exp.printStackTrace()
-                        null
+                    while (sq != searchQuery) {
+                        sq = searchQuery
+                        delay(500)
                     }
+
+                    isJobWaitingForTimeout = false
+                    if (!sq.isNullOrBlank()) {
+                        _searchPrediction.value = withContext(Dispatchers.IO) {
+                            try {
+                                getSearchPredictions(sq)
+                            } catch (exp: Exception) {
+                                exp.printStackTrace()
+                                null
+                            }
+                        }
+                    } else {
+                        _searchPrediction.value = null
+                    }
+                } finally {
+                    isJobWaitingForTimeout = false
                 }
-            } else {
-                _searchPrediction.value = null
             }
         }
     }
@@ -65,8 +84,21 @@ class MainViewModel : ViewModel() {
             SearchPredictionDeserializer()
         ).create()
 
+        /*val okHttpClient = OkHttpClient.Builder()
+            .cache(Cache(getApplication<Application>().cacheDir, 5 * 1_024 * 1_024))
+            .addInterceptor { chain ->
+                val request =
+                    chain.request().newBuilder()
+                        .header("Cache-Control", "public, max-age=" + 5 * 60 * 60)
+                        .build()
+                chain.proceed(request)
+            }
+            .build()*/
+
+
         val retrofit = Retrofit.Builder()
             .baseUrl(BASE_URL)
+            //.client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create(gson))
             .build()
 

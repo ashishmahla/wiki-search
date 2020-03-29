@@ -7,7 +7,7 @@
 
             <CustomAttribute
                 app:attributeName="backgroundColor"
-                app:customColorValue="#FFFFFF" />
+                app:customColorValue="#F7F6F5" />
         </Constraint>
 
         <Constraint

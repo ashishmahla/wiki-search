@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_main"
+    app:startDestination="@id/mainFragment">
+
+    <fragment
+        android:id="@+id/mainFragment"
+        android:name="com.android.apps.wikisearch.ui.main.MainFragment"
+        android:label="main_fragment"
+        tools:layout="@layout/main_fragment">
+
+        <action
+            android:id="@+id/action_mainFragment_to_webViewFragment"
+            app:destination="@id/webViewFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/webViewFragment"
+        android:name="com.android.apps.wikisearch.ui.webview.WebViewFragment"
+        android:label="WebViewFragment"
+        tools:layout="@layout/fragment_web_view">
+
+        <argument
+            android:name="title"
+            app:argType="string"
+            app:nullable="false" />
+
+        <argument
+            android:name="urlToLoad"
+            app:argType="string"
+            app:nullable="false" />
+    </fragment>
+</navigation>

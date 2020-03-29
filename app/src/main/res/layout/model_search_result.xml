@@ -3,7 +3,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="120dp"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="12dp"
+    android:layout_marginTop="12dp"
+    android:layout_marginEnd="12dp"
     app:contentPadding="12dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -12,10 +15,14 @@
 
         <ImageView
             android:id="@+id/ivMsrImage"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="0dp"
+            android:layout_marginEnd="16dp"
+            android:paddingStart="0dp"
+            android:paddingEnd="16dp"
+            android:scaleType="centerInside"
+            app:layout_constrainedWidth="true"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:srcCompat="@tools:sample/avatars" />
@@ -24,8 +31,6 @@
             android:id="@+id/mtvMsrTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
             android:maxLines="2"
             android:textColor="#1A0DAB"
             android:textSize="16sp"
@@ -39,8 +44,6 @@
             android:id="@+id/mtvMsrLink"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
             android:ellipsize="end"
             android:maxLines="1"
             android:textColor="#707070"
@@ -54,10 +57,9 @@
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/mtvMsrDescription"
             android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginStart="16dp"
+            android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:layout_marginEnd="16dp"
+            android:maxLines="4"
             android:textColor="#000"
             android:textSize="14sp"
             app:layout_constraintBottom_toBottomOf="parent"

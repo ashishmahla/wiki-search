@@ -12,16 +12,16 @@ interface ApiInterface {
         "api.php?" +
                 "action=query" +
                 "&format=json" +
-                "&prop=pageimages%7Cpageterms" +
+                "&prop=info%7Cpageimages%7Cpageterms" +
+                "&inprop=url" +
                 "&generator=prefixsearch" +
                 "&redirects=1" +
                 "&formatversion=2" +
                 "&piprop=thumbnail" +
-                "&pithumbsize=50" +
+                "&pithumbsize=100" +
                 "&pilimit=10" +
                 "&wbptterms=description" +
-                // "&gpssearch={searchQuery}" +
-                "&gpslimit=10"
+                "&gpslimit=17"
     )
     fun searchPredictions(@Query("gpssearch") searchQuery: String?): Call<SearchPrediction>
 }
